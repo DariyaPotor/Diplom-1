@@ -14,6 +14,6 @@ public class BunTests  {
     @Test
     public void getBunPriceTest(){
         Bun bun = new Bun(CRATER_BUN, CRATER_PRICE);
-        assertEquals(CRATER_PRICE, bun.getPrice(), 0);
+        assertEquals(CRATER_PRICE, bun.getPrice(), DELTA);
     }
 }

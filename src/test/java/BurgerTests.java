@@ -1,7 +1,6 @@
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -17,44 +16,30 @@ public class BurgerTests {
 
     @Mock
     Bun bun;
-    private String name;
-    private IngredientType type;
-    private float price;
-
-
-    @Parameterized.Parameters
-    public static Object[] data() {
-        return new Object[][]{
-                {IngredientType.SAUCE, "hot sauce", 100},
-                {IngredientType.SAUCE, "sour cream", 200},
-                {IngredientType.SAUCE, "chili sauce", 300},
-                {IngredientType.FILLING, "cutlet", 100},
-                {IngredientType.FILLING, "dinosaur", 200},
-                {IngredientType.FILLING, "sausage", 300},
-                {IngredientType.SAUCE, "", 0},
-                {IngredientType.SAUCE, "", -100},
-        };
-    }
+    @Mock
+    Ingredient ingredientMock;
 
     @Test
     public void setBunsTest() {
-        Bun bun = new Bun(name, price);
+        Bun bunStub = new Bun("stubBun", 100);
         Burger burger = new Burger();
-        burger.setBuns(bun);
-        assertEquals(bun, burger.bun);
+        burger.setBuns(bunStub);
+        assertEquals(bunStub, burger.bun);
     }
 
     @Test
     public void addIngredientTest() {
         Burger burger = new Burger();
-        burger.addIngredient(new Ingredient(type, name, price));
+        Ingredient ingredientStub = new Ingredient(IngredientType.SAUCE, "stubSauce", 50);
+        burger.addIngredient(ingredientStub);
         assertFalse("Ингредиенты пусты :(", burger.ingredients.isEmpty());
     }
 
     @Test
     public void removeIngredientTest() {
         Burger burger = new Burger();
-        burger.addIngredient(new Ingredient(type, name, price));
+        Ingredient ingredientStub = new Ingredient(IngredientType.FILLING, "stubFilling", 75);
+        burger.addIngredient(ingredientStub);
         burger.removeIngredient(0);
         assertTrue("Ингредиенты не удалились :(", burger.ingredients.isEmpty());
     }
@@ -62,33 +47,31 @@ public class BurgerTests {
     @Test
     public void moveIngredientTest() {
         Burger burger = new Burger();
-        burger.addIngredient(new Ingredient(IngredientType.SAUCE, "hot sauce", 100));
-        burger.addIngredient(new Ingredient(IngredientType.FILLING, "cutlet", 100));
+        Ingredient sauceStub = new Ingredient(IngredientType.SAUCE, "stubSauce", 40);
+        Ingredient fillingStub = new Ingredient(IngredientType.FILLING, "stubFilling", 80);
+        burger.addIngredient(sauceStub);
+        burger.addIngredient(fillingStub);
         burger.moveIngredient(0, 1);
-        String expectedResult = "cutlet";
+        String expectedResult = "stubFilling";
         String actualResult = burger.ingredients.get(0).name;
         assertEquals("Не удалось поменять ингредиенты местами :(", expectedResult, actualResult);
     }
 
     @Test
     public void getPriceTest() {
-        Bun bun = new Bun("white bun", 200);
+        Bun bunStub = new Bun("white bun", 200);
         Burger burger = new Burger();
-        burger.setBuns(bun);
+        burger.setBuns(bunStub);
         burger.addIngredient(new Ingredient(IngredientType.SAUCE, "hot sauce", 100));
         burger.addIngredient(new Ingredient(IngredientType.FILLING, "dinosaur", 200));
         float expectedPrice = 700;
         assertEquals(expectedPrice, burger.getPrice(), 0.001);
     }
 
-    @Mock
-    Ingredient ingredientMock;
-
     @Test
     public void getReceiptTest() {
         Burger burger = new Burger();
         burger.setBuns(bun);
-        String result = String.format("(==== Флюоресцентная булка R2-D3 ====)%n" + "= filling Говяжий метеорит(отбивная) =%n" + "(==== Флюоресцентная булка R2-D3 ====)%n" + "%n" + "Price: 600,000000%n");
 
         burger.addIngredient(ingredientMock);
 
@@ -98,7 +81,12 @@ public class BurgerTests {
         Mockito.when(ingredientMock.getName()).thenReturn("Говяжий метеорит(отбивная)");
         Mockito.when(ingredientMock.getType()).thenReturn(IngredientType.FILLING);
 
+        String result = String.format("(==== Флюоресцентная булка R2-D3 ====)%n" +
+                "= filling Говяжий метеорит(отбивная) =%n" +
+                "(==== Флюоресцентная булка R2-D3 ====)%n" +
+                "%n" +
+                "Price: 600,000000%n");
+
         Assert.assertEquals(result, burger.getReceipt());
     }
 }
-
